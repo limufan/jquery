@@ -1,0 +1,201 @@
+﻿<!DOCTYPE html>
+<html>
+	<head>
+		<title>datagrid</title>
+		<link type="text/css" href="css/smoothness/jquery-ui-1.8.23.custom.css" rel="stylesheet" />
+		<link rel="Stylesheet" media="screen" href="qunit/qunit.css" />
+		<link type="text/css" href="css/smoothness/jquery-ui-datagrid.css" rel="stylesheet" />
+		<script type="text/javascript" src="js/jquery-1.8.0.min.js"></script>
+		<script type="text/javascript" src="js/jquery-ui-1.8.23.custom.min.js"></script>
+		<script type="text/javascript" src="js/jquery.ui.datagrid.js"></script>
+		<script type="text/javascript" src="qunit/qunit.js"></script>
+	</head>
+	<style>
+		body{font-size: 13px;}
+	</style>
+	<body>
+		<div class="buttons">
+			<input type="button" value="add"/>
+			<input type="button" value="modify first"/>
+			<input type="button" value="delete selected"/>
+			<input type="button" value="set width 800"/>
+			<input type="button" value="set width 500"/>
+			<input type="button" value="set height 300"/>
+			<input type="button" value="set height 100"/>
+			<input type="button" value="set data"/>
+			<input type="button" value="set 3 columns"/>
+			<input type="button" value="set 6 columns"/>
+		</div>
+		<div id="datagrid"></div>
+		
+		<h1 id="qunit-header">QUnit example</h1>
+		<h2 id="qunit-banner"></h2>
+		<div id="qunit-testrunner-toolbar"></div>
+		<h2 id="qunit-userAgent"></h2>
+		<ol id="qunit-tests"></ol>
+		<div id="qunit-fixture">test markup, will be hidden</div>
+	</body>
+</html>
+
+<script type="text/javascript">
+	$(function(){
+	$("#datagrid").datagrid({
+		columns:[
+			{name:"c1", title: "t111111111111111111111111", width: 220, field:"f1", sortDirection: "desc", render: function(row, args){
+				return "<a href='#" + args.data.id + "'>"+args.value+"</a>";
+			}},
+			{name:"c2", title: "t2", field:"f2"},
+			{name:"c3", title: "t3", field:"f3"},
+			{name:"c4", title: "t4", field:"id", render: function(row, args){ 
+				return $("<a></a>").text("edit").attr("href", "#").click(function(){
+					row.datarow("option", "data", {id: args.data.id, f1: "update1", "f2": "update2"});
+					return false;
+				});
+			}}
+		],
+		canSort: true,
+		singleSelect: false,
+		width: 590,
+		height: 200, 
+		data:[{id: 1, f1: "t122222222222222222222222444", "f2": "t2"},{id: 2, f1: "dsfsd", "f2": "t2"},{id: 3, f1: "dsf11sd", "f2": "t2"}],
+		selectedRow: function(sender, args){
+			ok( true, "selected event" );
+		},
+		unselectedRow: function(sender, args){
+			ok( true, "unselected event" );
+		},
+		updatedRow: function(sender, args){
+			ok( true, "updatedRow event" );
+		},
+		deletedRow: function(sender, args){
+			if(!deletedRowEventTriggered){
+				deletedRowEventTriggered = true;
+				ok( true, "deletedRow event" );
+			}
+		},
+		showNumberRow: true
+	});
+	});
+</script>
+<script type="text/javascript">
+	$(function(){
+	return;
+	test("datagrid", 6, function(){
+		var addedRowEventTriggered = false;
+		var deletedRowEventTriggered = false;
+		$("#datagrid").datagrid({
+			columns:[
+				{name:"c1", title: "t111111111111111111", width: 220, field:"f1", sortBy: "desc", render: function(row, args){
+					return "<a href='#" + args.data.id + "'>"+args.value+"</a>";
+				}},
+				{name:"c2", title: "t2", field:"f2"},
+				{name:"c3", title: "t3", field:"f3"},
+				{name:"c4", title: "t4", field:"id", render: function(row, args){ 
+					return $("<a></a>").text("edit").attr("href", "#").click(function(){
+						row.datarow("option", "data", {id: args.data.id, f1: "update1", "f2": "update2"});
+						return false;
+					});
+				}}
+			],
+			canSort: true,
+			singleSelect: false,
+			width: 590,
+			height: 200, 
+			data:[{id: 1, f1: "t122222222222222222222222444", "f2": "t2"},{id: 2, f1: "dsfsd", "f2": "t2"},{id: 3, f1: "dsf11sd", "f2": "t2"}],
+			selectedRow: function(sender, args){
+				ok( true, "selected event" );
+			},
+			unselectedRow: function(sender, args){
+				ok( true, "unselected event" );
+			},
+			updatedRow: function(sender, args){
+				ok( true, "updatedRow event" );
+			},
+			deletedRow: function(sender, args){
+				if(!deletedRowEventTriggered){
+					deletedRowEventTriggered = true;
+					ok( true, "deletedRow event" );
+				}
+			},
+			showNumberRow: true
+		});
+		$("#datagrid").bind("datagridaddedrow", function(){ 
+			if(!addedRowEventTriggered){
+				ok( true, "addedRow event" );
+				addedRowEventTriggered = true;
+			}
+		});
+		
+		$(".buttons input[type='button']")
+		 .eq(0).click(function(){
+			$("#datagrid").datagrid("appendRow", {f1: "new1", "f2": "new12"});
+		 }).end()
+		 .eq(1).click(function(){
+			$("#datagrid").datagrid("updateRow", 0, {f1: "update1", "f2": "update2"});
+		 }).end()
+		 .eq(2).click(function(){
+			$("#datagrid").datagrid("deleteSelectedRow");
+		 }).end()
+		 .eq(3).click(function(){
+			$("#datagrid").datagrid("option", "width", 800);
+		 }).end()
+		 .eq(4).click(function(){
+			$("#datagrid").datagrid("option", "width", 500);
+		 }).end()
+		 .eq(5).click(function(){
+			$("#datagrid").datagrid("option", "height", 300);
+		 }).end()
+		 .eq(6).click(function(){
+			$("#datagrid").datagrid("option", "height", 100);
+		 }).end()
+		 .eq(7).click(function(){
+			$("#datagrid").datagrid("option", "data", [{id: 1, f1: "123", "f2": "t2"},{id: 2, f1: "123", "f2": "t2"},{id: 3, f1: "123213", "f2": "t2"}]);
+		 }).end()
+		 .eq(8).click(function(){
+			$("#datagrid").datagrid("option", "columns", [
+				{name:"c1", title: "t2", field:"f2"},
+				{name:"c2", title: "t3", field:"f3"},
+				{name:"c3", title: "t4", field:"id", render: function(row, args){ 
+					return $("<a></a>").text("edit").attr("href", "#").click(function(){
+						row.datarow("option", "data", {id: args.data.id, f1: "update1", "f2": "update2"});
+						return false;
+					});
+				}}
+			]);
+		 }).end()
+		 .eq(9).click(function(){
+			$("#datagrid").datagrid("option", "columns", [
+				{name:"c1", title: "t1", field:"f1"},
+				{name:"c2", title: "t2", field:"f2"},
+				{name:"c3", title: "t3", field:"f3"},
+				{name:"c4", title: "t4", field:"id", render: function(row, args){ 
+					return $("<a></a>").text("edit").attr("href", "#").click(function(){
+						row.datarow("option", "data", {id: args.data.id, f1: "update1", "f2": "update2"});
+						return false;
+					});
+				}},
+				{name:"c5", title: "t5", field:"f3"},
+				{name:"c6", title: "t6", field:"f3"}
+			]);
+		 }).end();
+		 
+		$("#datagrid").datagrid("selectRow", 1);
+		$("#datagrid").datagrid("unselectRow", 1);
+		$("#datagrid").datagrid("deleteRow", 1);
+		
+		$(".buttons input[type='button']")
+		.eq(0).click()
+		.end().eq(1).click()
+		.end().eq(2).click()
+		.end().eq(3).click()
+		.end().eq(4).click()
+		.end().eq(5).click()
+		.end().eq(6).click()
+		.end().eq(7).click()
+		.end().eq(8).click()
+		.end().eq(9).click();
+		
+		ok( true, "test end" );
+	});
+	})
+</script>
